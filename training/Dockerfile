@@ -13,15 +13,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the training script and data into the container
-COPY data/ app/data
-COPY data_process/ app/data_process
-COPY training/ app/training
+COPY data/ ./data
+COPY data_process/ ./data_process
+COPY training/ ./training
 
-# Copy utils.py
-COPY utils.py /app
 COPY ${CONF_PATH} /app
 
-RUN python data_process/data_loader.py
+RUN python3 data_process/data_loader.py
 
 # Command to run the training script
-RUN python, train.py
+RUN python3 training/train.py

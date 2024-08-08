@@ -1,19 +1,39 @@
 """
 This script prepares the data, runs the training, and saves the model.
 """
-
+import logging
 import os
+import json
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 import pandas as pd
-import numpy as np
+
+# Create logger
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Change to CONF_FILE = "settings.json" if you have problems with env variables
+CONF_FILE = os.getenv('CONF_PATH')
+
+logger.info("Loading configuration settings from JSON...")
+with open(CONF_FILE, "r") as file:
+    conf = json.load(file)
+
+logger.info("Defining paths...")
 
 # Configuration
-DATA_PATH = "./data/iris_train_data.csv"
-MODEL_PATH = "./models/iris_model.pth"
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.abspath(os.path.join(ROOT_DIR, (conf['general']['data_dir'])))
+DATA_PATH = os.path.join(DATA_DIR, conf['train']['table_name'])
+MODEL_DIR = os.path.abspath(os.path.join(ROOT_DIR, (conf['general']['models_dir'])))
+MODEL_PATH = os.path.join(MODEL_DIR, conf['inference']['model_name'])
+if not os.path.exists(MODEL_DIR):
+    os.makedirs(MODEL_DIR)
+    logger.info(f"Directory  {MODEL_DIR} was created.")
 BATCH_SIZE = 16
 LEARNING_RATE = 0.01
 EPOCHS = 50

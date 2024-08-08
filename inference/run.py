@@ -24,16 +24,18 @@ sys.path.append(os.path.dirname(ROOT_DIR))
 # Use an environment variable or default to 'settings.json'
 CONF_FILE = os.getenv('CONF_PATH', 'settings.json')
 
-from utils import get_project_dir, configure_logging
 
 # Load configuration settings from JSON
 with open(CONF_FILE, "r") as file:
     conf = json.load(file)
 
 # Define paths
-DATA_DIR = get_project_dir(conf['general']['data_dir'])
-MODEL_DIR = get_project_dir(conf['general']['models_dir'])
-RESULTS_DIR = get_project_dir(conf['general']['results_dir'])
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.abspath(os.path.join(ROOT_DIR, (conf['general']['data_dir'])))
+MODEL_DIR = os.path.abspath(os.path.join(ROOT_DIR, (conf['general']['models_dir'])))
+RESULTS_DIR = os.path.abspath(os.path.join(ROOT_DIR, (conf['general']['results_dir'])))
+if not os.path.exists(RESULTS_DIR):
+    os.makedirs(RESULTS_DIR)
 
 # Initialize parser for command line arguments
 parser = argparse.ArgumentParser()
@@ -121,7 +123,7 @@ def save_metrics(predictions, labels, path: str = None) -> None:
 
 
 def main():
-    configure_logging()
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     args = parser.parse_args()
 
     model = get_model_by_path(get_latest_model_path())
